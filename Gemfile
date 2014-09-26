@@ -1,5 +1,7 @@
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
+gem 'hocon', :path => "/code/ruby-hocon"
+
 group :development, :test do
   gem 'rake',                    :require => false
   gem 'rspec', '~> 2.11',        :require => false

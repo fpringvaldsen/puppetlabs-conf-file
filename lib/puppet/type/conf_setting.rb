@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:ini_setting) do
+Puppet::Type.newtype(:conf_setting) do
 
   ensurable do
     defaultvalues

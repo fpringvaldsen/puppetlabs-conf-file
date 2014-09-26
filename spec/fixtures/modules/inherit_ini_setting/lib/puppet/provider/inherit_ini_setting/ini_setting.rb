@@ -1,6 +1,6 @@
 Puppet::Type.type(:inherit_ini_setting).provide(
-  :ini_setting,
-  :parent => Puppet::Type.type(:ini_setting).provider(:ruby)
+  :conf_setting,
+  :parent => Puppet::Type.type(:conf_setting).provider(:ruby)
 ) do
   def section
     '' # all global

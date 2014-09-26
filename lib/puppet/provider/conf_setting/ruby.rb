@@ -1,6 +1,8 @@
-require File.expand_path('../../../util/ini_file', __FILE__)
+require 'hocon/config_factory'
+require 'hocon/config_value_factory'
+require File.expand_path('../../../util/config_saver', __FILE__)
 
-Puppet::Type.type(:ini_setting).provide(:ruby) do
+Puppet::Type.type(:conf_setting).provide(:ruby) do
 
   def self.instances
     # this code is here to support purging and the query-all functionality of the
@@ -13,11 +15,11 @@ Puppet::Type.type(:ini_setting).provide(:ruby) do
     # all settings from a particular ini file except those included in
     # the catalog.
     if self.respond_to?(:file_path)
-      # figure out what to do about the seperator
-      ini_file  = Puppet::Util::IniFile.new(file_path, '=')
+      # figure out what to do about the separator
+      conf_file  = Hocon::ConfigFactory.parse_file(file_path)
       resources = []
-      ini_file.section_names.each do |section_name|
-        ini_file.get_settings(section_name).each do |setting, value|
+      conf_file.section_names.each do |section_name|
+        conf_file.get_settings(section_name).each do |setting, value|
           resources.push(
             new(
               :name   => namevar(section_name, setting),
@@ -29,37 +31,39 @@ Puppet::Type.type(:ini_setting).provide(:ruby) do
       end
       resources
     else
-      raise(Puppet::Error, 'Ini_settings only support collecting instances when a file path is hard coded')
+      raise(Puppet::Error, 'Conf_settings only support collecting instances when a file path is hard coded')
     end
   end
 
   def self.namevar(section_name, setting)
-    "#{section_name}/#{setting}"
+    "#{setting}"
   end
 
   def exists?
-    !ini_file.get_value(section, setting).nil?
+    conf_file.has_path(setting)
   end
 
   def create
-    ini_file.set_value(section, setting, resource[:value])
-    ini_file.save
-    @ini_file = nil
+    conf_file = @conf_file
+    value = Hocon::ConfigValueFactory.from_any_ref(resource[:value], nil)
+    conf_file = conf_file.with_value(setting, value)
+    Puppet::Util::ConfigSaver.save(resource[:path], conf_file)
+    @conf_file = nil
   end
 
   def destroy
-    ini_file.remove_setting(section, setting)
-    ini_file.save
-    @ini_file = nil
+    conf_file.remove_setting(section, setting)
+    conf_file.save
+    @conf_file = nil
   end
 
   def value
-    ini_file.get_value(section, setting)
+    conf_file.get_value(setting)
   end
 
   def value=(value)
-    ini_file.set_value(section, setting, resource[:value])
-    ini_file.save
+    conf_file.set_value(setting, resource[:value])
+    conf_file.save
   end
 
   def section
@@ -76,7 +80,7 @@ Puppet::Type.type(:ini_setting).provide(:ruby) do
     # this method is here to support purging and sub-classing.
     # if a user creates a type and subclasses our provider and provides a
     # 'file_path' method, then they don't have to specify the
-    # path as a parameter for every ini_setting declaration.
+    # path as a parameter for every conf_setting declaration.
     # This implementation allows us to support that while still
     # falling back to the parameter value when necessary.
     if self.class.respond_to?(:file_path)
@@ -95,8 +99,8 @@ Puppet::Type.type(:ini_setting).provide(:ruby) do
   end
 
   private
-  def ini_file
-    @ini_file ||= Puppet::Util::IniFile.new(file_path, separator)
+  def conf_file
+    @conf_file ||= Hocon::ConfigFactory.parse_file(file_path)
   end
 
 end
