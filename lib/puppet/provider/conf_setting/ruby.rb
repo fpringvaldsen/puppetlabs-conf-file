@@ -44,10 +44,9 @@ Puppet::Type.type(:conf_setting).provide(:ruby) do
   end
 
   def create
-    conf_file = @conf_file
     value = Hocon::ConfigValueFactory.from_any_ref(resource[:value], nil)
-    conf_file = conf_file.with_value(setting, value)
-    Puppet::Util::ConfigSaver.save(resource[:path], conf_file)
+    conf_file_modified = conf_file.with_value(setting, value)
+    Puppet::Util::ConfigSaver.save(resource[:path], conf_file_modified)
     @conf_file = nil
   end
 
@@ -58,12 +57,14 @@ Puppet::Type.type(:conf_setting).provide(:ruby) do
   end
 
   def value
-    conf_file.get_value(setting)
+    conf_file.get_value(setting).unwrapped
   end
 
   def value=(value)
-    conf_file.set_value(setting, resource[:value])
-    conf_file.save
+    value = Hocon::ConfigValueFactory.from_any_ref(resource[:value], nil)
+    conf_file_modified = conf_file.with_value(setting, value)
+    Puppet::Util::ConfigSaver.save(resource[:path], conf_file_modified)
+    @conf_file = nil
   end
 
   def section
