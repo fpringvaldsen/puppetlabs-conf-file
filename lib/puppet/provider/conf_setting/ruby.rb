@@ -51,8 +51,8 @@ Puppet::Type.type(:conf_setting).provide(:ruby) do
   end
 
   def destroy
-    conf_file.remove_setting(section, setting)
-    conf_file.save
+    conf_file_modified = conf_file.without_path(setting)
+    Puppet::Util::ConfigSaver.save(resource[:path], conf_file_modified)
     @conf_file = nil
   end
 
