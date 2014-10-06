@@ -1,10 +1,10 @@
 {
-    "name": "puppetlabs-inifile",
+    "name": "puppetlabs-conffile",
     "version": "1.1.1",
-    "source": "https://github.com/puppetlabs/puppetlabs-inifile",
+    "source": "https://github.com/puppetlabs/puppetlabs-conffile",
     "author": "Puppet Labs",
     "license": "Apache-2.0",
-    "project_page": "https://github.com/puppetlabs/puppetlabs-inifile",
+    "project_page": "https://github.com/puppetlabs/puppetlabs-conffile",
     "summary": "Resource types for managing settings in INI files",
     "operatingsystem_support": [
       {

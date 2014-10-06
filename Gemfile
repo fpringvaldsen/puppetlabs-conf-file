@@ -1,6 +1,6 @@
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
-gem 'hocon', :path => "/code/ruby-hocon"
+#gem 'hocon', '~> 0.0.5',         :require => false
 
 group :development, :test do
   gem 'rake',                    :require => false
@@ -26,5 +26,7 @@ if puppetversion = ENV['PUPPET_GEM_VERSION']
 else
   gem 'puppet', :require => false
 end
+
+gem 'hocon', '~> 0.0.5',       :require => false
 
 # vim:ft=ruby

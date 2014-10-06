@@ -13,6 +13,7 @@ unless ENV['RS_PROVISION'] == 'no'
       on host, 'echo \'export PATH=/var/lib/gems/1.8/bin/:${PATH}\' >> ~/.bashrc'
       on host, "mkdir -p #{host['distmoduledir']}"
     end
+    on host, "gem install hocon"
   end
 end
 
@@ -28,7 +29,7 @@ RSpec.configure do |c|
     # Install module and dependencies
     hosts.each do |host|
       if host['platform'] !~ /windows/i
-        copy_root_module_to(host, :source => proj_root, :module_name => 'inifile')
+        copy_root_module_to(host, :source => proj_root, :module_name => 'conffile')
       end
     end
     hosts.each do |host|
